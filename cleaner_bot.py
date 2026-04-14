@@ -2,6 +2,7 @@ import click
 import os
 from dotenv import load_dotenv
 from groq import Groq
+from validator import validate_and_sanitize
 
 load_dotenv()
 
@@ -93,8 +94,12 @@ def refactor_code(code: str, language: str) -> dict:
 def main(input_file, output, language):
     """Clean Code Bot — refactors messy code into SOLID, documented code."""
 
-    with open(input_file, "r") as f:
-        dirty_code = f.read()
+    # Validate and sanitize before anything else
+    try:
+        dirty_code = validate_and_sanitize(input_file)
+    except ValueError as e:
+        click.echo(f"/n Error: {e}", err=True)
+        raise SystemExit(1)
 
     click.echo(f"\n Reading: {input_file}")
     click.echo(f" Language: {language}")
